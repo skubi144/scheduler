@@ -17,7 +17,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@scheduler/view": [
+        "apps/view/src/index.ts"
+      ]
+    }
   },
   "exclude": [
     "node_modules",
