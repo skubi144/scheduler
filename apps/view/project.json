@@ -9,12 +9,11 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "outputPath": "dist/apps/view",
-        "main": "libs/view/src/index.ts",
-        "tsConfig": "libs/view/tsconfig.app.json"
+        "command": "npx webpack build --config ./apps/view/webpack.config.js"
       }
     }
   }
 }
+
 
 

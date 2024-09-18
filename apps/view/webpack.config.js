@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
     mode: "development",
-    entry: './index.ts',
+    entry: path.resolve(__dirname, './src/electron.main.ts'),
     target: "electron-main",
     module: {
         rules: [
@@ -18,7 +18,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js'],
     },
     output: {
-        filename: 'bundle.js',
+        filename: 'bundle.main.js',
         path: path.resolve(__dirname, '../../', 'dist', 'apps', 'view'),
     },
 };
