@@ -1,15 +1,19 @@
 import {app, BrowserWindow} from 'electron'
+import * as path from "path";
 
-const createWindow = () => {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600
+let mainWindow: BrowserWindow | undefined;
+const createWindow = async () => {
+  mainWindow = new BrowserWindow({
+    fullscreen: true,
+    webPreferences: {
+      nodeIntegration: true,
+    },
   })
+  const htmlPath = path.resolve(__dirname, 'index.html');
 
-  win.loadFile('index.html')
+  await mainWindow.loadFile(htmlPath);
+  // mainWindow.webContents.openDevTools();
 }
 
-app.whenReady().then(() => {
-  createWindow()
-})
+app.whenReady().then(createWindow)
 

@@ -3,13 +3,42 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/view/src",
   "projectType": "application",
+  "implicitDependencies": [
+    "embeddable-view"
+  ],
   "tags": [],
   "// targets": "to see all targets run: nx show project view --web",
   "targets": {
-    "build": {
+    "merge-embeddable-view": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx webpack build --config ./apps/view/webpack.config.js"
+        "command": "mv ./dist/apps/embeddable-view/* ./dist/apps/view"
+      }
+    },
+    "cleanup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "rm -rf ./dist"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "cleanup",
+        "embeddable-view:build"
+      ],
+      "options": {
+        "commands": [
+          "npx webpack build --config ./apps/view/webpack.config.js",
+          "nx run view:merge-embeddable-view"
+        ],
+        "parallel": false
+      }
+    },
+    "run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "electron ./dist/apps/view/bundle.main.js"
       }
     }
   }
