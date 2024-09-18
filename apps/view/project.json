@@ -36,9 +36,30 @@
       }
     },
     "run": {
+      "dependsOn": [
+        "build"
+      ],
       "executor": "nx:run-commands",
       "options": {
         "command": "electron ./dist/apps/view/bundle.main.js"
+      }
+    },
+    "make:host-default": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build"
+      ],
+      "options": {
+        "command": "electron-forge make"
+      }
+    },
+    "make:x64": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "build"
+      ],
+      "options": {
+        "command": "electron-forge make --arch=x64"
       }
     }
   }
