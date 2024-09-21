@@ -1,5 +1,8 @@
-import {app, BrowserWindow} from 'electron'
+import {app, BrowserWindow, ipcMain} from 'electron'
 import * as path from "path";
+import Store from "electron-store";
+
+Store.initRenderer();
 
 let mainWindow: BrowserWindow | undefined;
 const createWindow = async () => {
@@ -13,7 +16,6 @@ const createWindow = async () => {
 
   const htmlPath = path.resolve(__dirname, 'index.html');
   mainWindow.webContents.openDevTools();
-
   await mainWindow.loadFile(htmlPath);
 }
 

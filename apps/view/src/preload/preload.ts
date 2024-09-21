@@ -1,9 +1,6 @@
-const {contextBridge, ipcRenderer} = require('electron')
+import {contextBridge} from "electron";
+import * as agent from '../../../agent/agent'
 
-console.log("RUNNING PRELOAD!")
-contextBridge.exposeInMainWorld('electronAPI', {
-  onUpdateCounter: (callback) => ipcRenderer.on('update-counter', (_event, value) => callback(value)),
-  counterValue: (value) => ipcRenderer.send('counter-value', value)
-})
+contextBridge.exposeInMainWorld('agent', {agent})
 
 
