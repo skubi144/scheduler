@@ -1,19 +1,21 @@
-import {BaseAgent, Mutations, Queries} from "./agent.interface";
+import {BaseAgent} from "./agent.interface";
 import {User} from "./types";
+import Store from "electron-store";
 
 
 export class Agent implements BaseAgent {
-  public mutations: Mutations = {
-    createUser: function (user: User): Promise<User> {
-      throw new Error("Function not implemented.");
+  store = new Store<{ users: User[] }>();
+
+  createUser(user: User): Promise<User> {
+    this.store.get('users');
+    return Promise.resolve(user);
     }
-  };
-  public queries: Queries = {
-    getUser: function (user: string): Promise<User> {
+
+  getUser(user: string): Promise<User> {
       throw new Error("Function not implemented.");
-    },
-    getUsers: function (user: string): Promise<User> {
+  }
+
+  getUsers(user: string): Promise<User> {
       throw new Error("Function not implemented.");
-    }
-  };
+  }
 }
