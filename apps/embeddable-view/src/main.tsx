@@ -14,3 +14,4 @@ root.render(
     </MemoryRouter>
   </StrictMode>
 );
+console.log(window)

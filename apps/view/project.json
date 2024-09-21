@@ -29,16 +29,14 @@
       ],
       "options": {
         "commands": [
-          "npx webpack build --config ./apps/view/webpack.config.js",
+          "npx webpack build --config ./apps/view/webpack.preload.config.js",
+          "npx webpack build --config ./apps/view/webpack.main.config.js",
           "nx run view:merge-embeddable-view"
         ],
         "parallel": false
       }
     },
     "run": {
-      "dependsOn": [
-        "build"
-      ],
       "executor": "nx:run-commands",
       "options": {
         "command": "electron ./dist/apps/view/bundle.main.js"
