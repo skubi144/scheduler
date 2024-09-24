@@ -9,11 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import {app, BrowserWindow, ipcMain, shell} from 'electron';
+import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import {resolveHtmlPath} from './util';
+import fs from "fs";
 
 class AppUpdater {
   constructor() {
@@ -28,6 +29,9 @@ let mainWindow: BrowserWindow | null = null;
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
+  const p = path.resolve(app.getPath('userData'), 'db.json');
+  console.log(p);
+  fs.writeFileSync(p, JSON.stringify({}));
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
