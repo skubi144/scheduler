@@ -11,3 +11,9 @@ window.electron.ipcRenderer.once('ipc-example', (arg) => {
   console.log(arg);
 });
 window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
+
+(async () => {
+  const x = await window.electron.store.get('example');
+  console.log(x,);
+
+})()

@@ -14,7 +14,7 @@ import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import {resolveHtmlPath} from './util';
-import fs from "fs";
+import {Agent} from "./agent";
 
 class AppUpdater {
   constructor() {
@@ -25,14 +25,22 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let agent = new Agent().setUserDataPath(app.getPath('userData'));
+
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
-  const p = path.resolve(app.getPath('userData'), 'db.json');
-  console.log(p);
-  fs.writeFileSync(p, JSON.stringify({}));
+
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.handle('store-get', async (event, key) => {
+  return agent._select(key)
+});
+
+ipcMain.on('store-set', async (event, key, value) => {
+  return agent._insert(key, value)
 });
 
 if (process.env.NODE_ENV === 'production') {
