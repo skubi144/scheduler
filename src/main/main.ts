@@ -8,15 +8,17 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import path from 'path';
-import {app, BrowserWindow, ipcMain, shell} from 'electron';
+import {app, BrowserWindow, shell, ipcMain} from 'electron';
 import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
+import sqlite from 'sqlite3';
 import MenuBuilder from './menu';
 import {resolveHtmlPath} from './util';
-import {Agent} from "./agent";
 
-class AppUpdater {
+export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
@@ -24,23 +26,31 @@ class AppUpdater {
   }
 }
 
-let mainWindow: BrowserWindow | null = null;
-let agent = new Agent().setUserDataPath(app.getPath('userData'));
+const sqlite3 = sqlite.verbose();
+const db = new sqlite3.Database(':memory:');
 
+db.serialize(() => {
+    db.run('CREATE TABLE lorem (info TEXT)');
+
+    const stmt = db.prepare('INSERT INTO lorem VALUES (?)');
+    for (let i = 0; i < 10; i += 1) {
+        stmt.run(`Ipsum ${i}`);
+    }
+    stmt.finalize();
+
+    db.each('SELECT rowid AS id, info FROM lorem', (_err, row) => {
+        console.log(`${row.id}: ${row.info}`);
+    });
+});
+
+db.close();
+
+let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
-
   event.reply('ipc-example', msgTemplate('pong'));
-});
-
-ipcMain.handle('store-get', async (event, key) => {
-  return agent._select(key)
-});
-
-ipcMain.on('store-set', async (event, key, value) => {
-  return agent._insert(key, value)
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -48,10 +58,10 @@ if (process.env.NODE_ENV === 'production') {
   sourceMapSupport.install();
 }
 
-const isDebug =
+const isDevelopment =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-if (isDebug) {
+if (isDevelopment) {
   require('electron-debug')();
 }
 
@@ -63,13 +73,13 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload,
+        forceDownload
     )
     .catch(console.log);
 };
 
 const createWindow = async () => {
-  if (isDebug) {
+    if (isDevelopment) {
     await installExtensions();
   }
 
@@ -87,9 +97,7 @@ const createWindow = async () => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      preload: app.isPackaged
-        ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js'),
+        preload: path.join(__dirname, 'preload.js'),
     },
   });
 
@@ -114,9 +122,9 @@ const createWindow = async () => {
   menuBuilder.buildMenu();
 
   // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
-    return { action: 'deny' };
+    mainWindow.webContents.on('new-window', (event, url) => {
+        event.preventDefault();
+        shell.openExternal(url);
   });
 
   // Remove this if your app does not use auto updates
